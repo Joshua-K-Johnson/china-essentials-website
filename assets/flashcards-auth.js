@@ -38,18 +38,18 @@
   if (hasCode) {
     status.dataset.state = "ready";
     status.textContent = mode === "recovery"
-      ? "Your secure reset session is ready. Open China Flashcards to choose a new password."
-      : "Your email has been verified. Open China Flashcards to finish signing in.";
+      ? "Your secure reset session is ready. Open Learn Chinese to choose a new password."
+      : "Your email has been verified. Open Learn Chinese to finish signing in.";
     button.disabled = false;
   } else if (hasError) {
     status.dataset.state = "error";
     status.textContent =
-      "This email link is invalid or has expired. Open China Flashcards to request a new one.";
+      "This email link is invalid or has expired. Open Learn Chinese to request a new one.";
     button.disabled = false;
   } else {
     status.dataset.state = "error";
     status.textContent =
-      "This page does not contain a valid authentication response. Request a new email from China Flashcards.";
+      "This page does not contain a valid authentication response. Request a new email from Learn Chinese.";
     button.disabled = true;
   }
 
