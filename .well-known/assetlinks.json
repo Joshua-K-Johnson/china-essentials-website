@@ -1,0 +1,14 @@
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.joshuakjohnson.chinaessentials",
+      "sha256_cert_fingerprints": [
+        "80:01:C1:03:F0:68:56:1E:FF:F3:35:2C:F0:E7:45:8A:30:3B:EC:55:2C:29:B3:8E:38:1B:37:AC:61:D0:6B:B2"
+      ]
+    }
+  }
+]

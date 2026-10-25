@@ -1,0 +1,9 @@
+{
+  "name": "china-essentials-site",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test:workshop": "node --test tests/workshop-backend.test.js",
+    "test:workshop-probe": "node --test tests/paypal-capture-probe.test.js"
+  }
+}

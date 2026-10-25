@@ -1,0 +1,26 @@
+/*
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=()
+  Content-Security-Policy: default-src 'self'; img-src 'self' data:; style-src 'self'; script-src 'self'; frame-src https://97f0c658.sibforms.com https://www.youtube-nocookie.com; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests
+  Cross-Origin-Opener-Policy: same-origin
+
+/.well-known/apple-app-site-association
+  Content-Type: application/json; charset=utf-8
+  Cache-Control: public, max-age=3600
+
+/.well-known/assetlinks.json
+  Content-Type: application/json; charset=utf-8
+  Cache-Control: public, max-age=3600
+
+/auth/*
+  Cache-Control: no-store
+  X-Robots-Tag: noindex
+
+/flashcards/auth/*
+  Cache-Control: no-store
+  X-Robots-Tag: noindex
+  Referrer-Policy: no-referrer
+
+/assets/*
+  Cache-Control: public, max-age=604800

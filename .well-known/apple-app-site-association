@@ -1,0 +1,29 @@
+{
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "appID": "B9SY58SGTB.com.joshuakjohnson.chinaessentials",
+        "components": [
+          {
+            "/": "/auth/confirmed*"
+          },
+          {
+            "/": "/auth/reset-password*"
+          }
+        ]
+      },
+      {
+        "appID": "B9SY58SGTB.com.chinaflashcards.chinaFlashcards",
+        "components": [
+          {
+            "/": "/flashcards/auth/confirmed*"
+          },
+          {
+            "/": "/flashcards/auth/reset-password*"
+          }
+        ]
+      }
+    ]
+  }
+}

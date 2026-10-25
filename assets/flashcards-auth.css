@@ -1,0 +1,76 @@
+.flashcards-auth-page {
+  --flashcards-blue: #087dc1;
+  --flashcards-blue-deep: #07578a;
+  --flashcards-ink: #092b50;
+  min-height: 100vh;
+  background:
+    linear-gradient(rgba(255, 255, 255, .78), rgba(247, 252, 255, .94)),
+    url("/assets/shanghai-hero.png") center / cover fixed;
+}
+
+.flashcards-auth-page .site-header {
+  background: rgba(248, 252, 255, .94);
+  border-bottom-color: rgba(8, 125, 193, .2);
+}
+
+.flashcards-brand-mark {
+  display: grid;
+  width: 52px;
+  height: 52px;
+  place-items: center;
+  border-radius: 12px;
+  background: linear-gradient(145deg, var(--flashcards-blue), #31a8d0);
+  color: white;
+  font-family: var(--serif);
+  font-size: 1.8rem;
+  font-weight: 800;
+  box-shadow: 0 10px 24px rgba(8, 125, 193, .2);
+}
+
+.flashcards-auth-page .auth-card {
+  border-color: rgba(8, 125, 193, .25);
+  border-radius: 8px;
+}
+
+.flashcards-auth-page .auth-card::after {
+  border-color: rgba(8, 125, 193, .25);
+  box-shadow:
+    0 0 0 22px rgba(8, 125, 193, .07),
+    0 0 0 44px rgba(8, 125, 193, .04);
+}
+
+.flashcards-auth-page .auth-icon,
+.flashcards-auth-page .button {
+  background: var(--flashcards-blue);
+}
+
+.flashcards-auth-page .button:hover {
+  background: var(--flashcards-blue-deep);
+}
+
+.flashcards-auth-page .button:disabled {
+  cursor: not-allowed;
+  opacity: .48;
+}
+
+.flashcards-auth-page .button.secondary {
+  color: var(--flashcards-ink);
+  background: transparent;
+}
+
+.flashcards-auth-status {
+  margin: 24px 0 0;
+  padding: 16px 18px;
+  border-left: 4px solid var(--flashcards-blue);
+  background: #edf8fd;
+  color: var(--flashcards-ink);
+}
+
+.flashcards-auth-status[data-state="error"] {
+  border-left-color: #c73f4f;
+  background: #fff1f2;
+}
+
+.flashcards-security-note {
+  font-size: .86rem;
+}
