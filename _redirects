@@ -6,6 +6,9 @@
 /auth/reset-password /auth/reset-password/ 301
 /flashcards/auth/confirmed /flashcards/auth/confirmed/ 301
 /flashcards/auth/reset-password /flashcards/auth/reset-password/ 301
+/flashcards /flashcards/ 301
+/flashcards/support /flashcards/support/ 301
+/flashcards/privacy /flashcards/privacy/ 301
 /beta /beta/ 301
 /workshop /workshop/ 301
 /china-ready /workshop/ 301

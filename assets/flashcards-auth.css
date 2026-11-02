@@ -1,11 +1,11 @@
 .flashcards-auth-page {
-  --flashcards-blue: #087dc1;
-  --flashcards-blue-deep: #07578a;
-  --flashcards-ink: #092b50;
+  --flashcards-blue: #008f8a;
+  --flashcards-blue-deep: #006d68;
+  --flashcards-ink: #061d31;
   min-height: 100vh;
   background:
-    linear-gradient(rgba(255, 255, 255, .78), rgba(247, 252, 255, .94)),
-    url("/assets/shanghai-hero.png") center / cover fixed;
+    linear-gradient(rgba(255, 255, 255, .8), rgba(245, 247, 250, .96)),
+    url("/assets/flashcards/app-splash.jpg") center / cover fixed;
 }
 
 .flashcards-auth-page .site-header {
@@ -19,7 +19,7 @@
   height: 52px;
   place-items: center;
   border-radius: 12px;
-  background: linear-gradient(145deg, var(--flashcards-blue), #31a8d0);
+  background: var(--flashcards-blue-deep);
   color: white;
   font-family: var(--serif);
   font-size: 1.8rem;
