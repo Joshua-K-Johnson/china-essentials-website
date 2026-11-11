@@ -34,6 +34,9 @@
   let challengeId = null;
   let factorId = null;
   let pendingEnrollment = null;
+  let loginSubmitting = false;
+  let mfaSubmitting = false;
+  let sessionAccepted = false;
 
   const showMessage = (message, isError = true) => {
     if (!loginMessage) return;
@@ -42,11 +45,15 @@
     loginMessage.hidden = !message;
   };
   const hideAuth = () => { if (authScreen) authScreen.hidden = true; document.body.classList.remove('auth-open'); };
-  const showAuth = () => { if (authScreen) authScreen.hidden = false; document.body.classList.add('auth-open'); };
+  const showAuth = () => { sessionAccepted = false; if (authScreen) authScreen.hidden = false; document.body.classList.add('auth-open'); };
   const acceptSession = (result) => {
     const token = result.access_token;
     if (!token || jwtClaims(token).aal !== 'aal2') throw new Error('Complete two-step verification before continuing.');
-    session.set({ access_token: token, refresh_token: result.refresh_token, expires_at: Date.now() + Number(result.expires_in || 3600) * 1000 });
+    if (sessionAccepted) return;
+    session.set({ access_token: token, refresh_token: result.refresh_token, expires_at: result.expires_at ? result.expires_at * 1000 : Date.now() + Number(result.expires_in || 3600) * 1000 });
+    sessionAccepted = true;
+    challengeId = null;
+    pendingEnrollment = null;
     hideAuth();
     window.dispatchEvent(new CustomEvent('admin:authenticated'));
   };
@@ -138,10 +145,15 @@
 
   loginForm?.addEventListener('submit', async (event) => {
     event.preventDefault();
+    if (loginSubmitting || sessionAccepted) return;
+    loginSubmitting = true;
     const button = $('button[type="submit"]', loginForm);
     button.disabled = true;
     showMessage('Signing in…', false);
     try {
+      challengeId = null;
+      factorId = null;
+      pendingEnrollment = null;
       const email = $('#admin-email').value.trim();
       const password = $('#admin-password').value;
       const supabase = await getAuthClient();
@@ -149,30 +161,55 @@
       if (jwtClaims(result.session.access_token).aal === 'aal2') acceptSession(result.session);
       else await beginMfa(result.session);
     } catch (error) { showMessage(error.message || 'Unable to sign in.'); }
-    finally { button.disabled = false; }
+    finally { loginSubmitting = false; button.disabled = false; }
   });
   $('#mfa-form')?.addEventListener('submit', async (event) => {
     event.preventDefault();
+    if (mfaSubmitting || sessionAccepted) return;
+    mfaSubmitting = true;
     const button = $('#mfa-verify');
     button.disabled = true;
+    let supabase;
     try {
       const code = $('#mfa-code').value.replace(/\s/g, '');
-      let challenge = challengeId;
-      const supabase = await getAuthClient();
-      if (pendingEnrollment) {
-        const value = requireAuthData(await supabase.auth.mfa.challenge({ factorId }));
-        challenge = value.id;
+      supabase = await getAuthClient();
+      if (!factorId) throw new Error('Sign in again to restart administrator verification.');
+      if (!challengeId) {
+        const nextChallenge = requireAuthData(await supabase.auth.mfa.challenge({ factorId }));
+        challengeId = nextChallenge.id;
       }
-      const result = requireAuthData(await supabase.auth.mfa.verify({ factorId, challengeId: challenge, code }));
-      pendingEnrollment = null;
+      const singleUseChallengeId = challengeId;
       challengeId = null;
-      acceptSession(result.session);
-    } catch (error) { showMessage(error.message || 'That code could not be verified. Check it and try again.'); }
-    finally { button.disabled = false; }
+      const verified = requireAuthData(await supabase.auth.mfa.verify({ factorId, challengeId: singleUseChallengeId, code }));
+
+      // MFA verify returns token fields directly; get the SDK's active session
+      // (and adopt the response if needed) before letting dashboard pages load.
+      let authSession = requireAuthData(await supabase.auth.getSession()).session;
+      if ((!authSession || jwtClaims(authSession.access_token).aal !== 'aal2') && verified.access_token && verified.refresh_token) {
+        authSession = requireAuthData(await supabase.auth.setSession({
+          access_token: verified.access_token,
+          refresh_token: verified.refresh_token,
+        })).session;
+      }
+      if (!authSession) throw new Error('Verification succeeded, but the authenticated session could not be loaded. Please try again.');
+      const assurance = requireAuthData(await supabase.auth.mfa.getAuthenticatorAssuranceLevel());
+      if (assurance.currentLevel !== 'aal2' || jwtClaims(authSession.access_token).aal !== 'aal2') {
+        throw new Error('Two-step verification did not produce an AAL2 session. Please try again.');
+      }
+      loginAccessToken = authSession.access_token;
+      acceptSession(authSession);
+    } catch (error) {
+      showMessage(error.message || 'That code could not be verified. Check it and try again.');
+      challengeId = null;
+      if (supabase && factorId && !sessionAccepted) {
+        try { challengeId = requireAuthData(await supabase.auth.mfa.challenge({ factorId })).id; }
+        catch { challengeId = null; }
+      }
+    } finally { mfaSubmitting = false; button.disabled = false; }
   });
   $('#cancel-mfa')?.addEventListener('click', async () => {
     if (loginAccessToken) try { const supabase = await getAuthClient(); await supabase.auth.signOut(); } catch { /* Drop the in-memory session even if Auth cannot be reached. */ }
-    session.clear(); loginAccessToken = null; pendingEnrollment = null; challengeId = null; factorId = null; mfaPanel.hidden = true; showMessage('Sign in again when you are ready.', false);
+    session.clear(); loginAccessToken = null; pendingEnrollment = null; challengeId = null; factorId = null; sessionAccepted = false; mfaPanel.hidden = true; showMessage('Sign in again when you are ready.', false);
   });
   $('#logout')?.addEventListener('click', (event) => { event.preventDefault(); window.AdminDashboard.logout(); });
   $('#menu-toggle')?.addEventListener('click', () => document.body.classList.toggle('sidebar-open'));
