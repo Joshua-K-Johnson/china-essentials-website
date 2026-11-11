@@ -13,13 +13,17 @@
   const dateTime = (value) => value ? new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(value)) : '—';
   const jwtClaims = (token) => { try { return JSON.parse(atob(token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/'))); } catch { return {}; } };
   const apiHeaders = (token) => ({ 'Content-Type': 'application/json', apikey: config.publishableKey, Authorization: `Bearer ${token}` });
-  const authRequest = async (path, body, token) => {
-    const headers = { 'Content-Type': 'application/json', apikey: config.publishableKey };
-    if (token) headers.Authorization = `Bearer ${token}`;
-    const response = await fetch(`${config.supabaseUrl}/auth/v1/${path}`, { method: 'POST', headers, body: JSON.stringify(body) });
-    const result = await response.json().catch(() => ({}));
-    if (!response.ok) throw new Error(result.msg || result.message || result.error_description || 'Authentication request failed.');
-    return result;
+  let authClientPromise;
+  const getAuthClient = () => {
+    authClientPromise ??= import('https://esm.sh/@supabase/supabase-js@2.57.4?bundle')
+      .then(({ createClient }) => createClient(config.supabaseUrl, config.publishableKey, {
+        auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
+      }));
+    return authClientPromise;
+  };
+  const requireAuthData = ({ data, error }) => {
+    if (error) throw new Error(error.message || 'Authentication request failed.');
+    return data;
   };
   const verifiedTotp = (factors) => (factors?.totp || []).find((factor) => factor.status === 'verified');
   const authScreen = $('#auth-screen');
@@ -62,23 +66,23 @@
   };
   const beginMfa = async (authResult) => {
     loginAccessToken = authResult.access_token;
-    const list = await fetch(`${config.supabaseUrl}/auth/v1/factors`, { headers: apiHeaders(loginAccessToken) });
-    const factors = await list.json().catch(() => ({}));
-    if (!list.ok) throw new Error('Could not load administrator verification settings.');
+    const supabase = await getAuthClient();
+    const factors = requireAuthData(await supabase.auth.mfa.listFactors());
     const existing = verifiedTotp(factors);
     if (!existing) {
-      const enrolled = await fetch(`${config.supabaseUrl}/auth/v1/factors`, { method: 'POST', headers: apiHeaders(loginAccessToken), body: JSON.stringify({ factor_type: 'totp', friendly_name: 'Learn Chinese Admin' }) });
-      const factor = await enrolled.json().catch(() => ({}));
-      if (!enrolled.ok) throw new Error('Authenticator setup is required. Check the Supabase Auth MFA settings and try again.');
+      let factor;
+      try {
+        factor = requireAuthData(await supabase.auth.mfa.enroll({ factorType: 'totp', friendlyName: 'Learn Chinese Admin' }));
+      } catch {
+        throw new Error('Authenticator setup is required. Check the Supabase Auth MFA settings and try again.');
+      }
       factorId = factor.id;
       renderEnrollment(factor);
       return;
     }
     factorId = existing.id;
-    const challenge = await fetch(`${config.supabaseUrl}/auth/v1/factors/${encodeURIComponent(factorId)}/challenge`, { method: 'POST', headers: apiHeaders(loginAccessToken), body: JSON.stringify({}) });
-    const detail = await challenge.json().catch(() => ({}));
-    if (!challenge.ok) throw new Error('Could not start authenticator verification.');
-    challengeId = detail.id;
+    const challenge = requireAuthData(await supabase.auth.mfa.challenge({ factorId }));
+    challengeId = challenge.id;
     $('#mfa-title').textContent = 'Verify your sign-in';
     $('#mfa-instructions').textContent = 'Enter the current six-digit code from your authenticator app.';
     $('#mfa-qr').hidden = true;
@@ -91,9 +95,13 @@
   const refreshSession = async (current) => {
     if (!current?.refresh_token) return null;
     try {
-      const result = await authRequest('token?grant_type=refresh_token', { refresh_token: current.refresh_token });
-      if (!result.access_token) return null;
-      const next = { access_token: result.access_token, refresh_token: result.refresh_token, expires_at: Date.now() + Number(result.expires_in || 3600) * 1000 };
+      const supabase = await getAuthClient();
+      const { session: refreshed } = requireAuthData(await supabase.auth.setSession({
+        access_token: current.access_token,
+        refresh_token: current.refresh_token,
+      }));
+      if (!refreshed?.access_token || jwtClaims(refreshed.access_token).aal !== 'aal2') return null;
+      const next = { access_token: refreshed.access_token, refresh_token: refreshed.refresh_token, expires_at: refreshed.expires_at * 1000 };
       session.set(next);
       return next;
     } catch { session.clear(); return null; }
@@ -118,7 +126,11 @@
   window.AdminDashboard = { request, fmt, date, dateTime, esc, currentSession, async logout() {
     const current = session.get();
     if (current?.access_token) {
-      try { await fetch(`${config.supabaseUrl}/auth/v1/logout`, { method: 'POST', headers: apiHeaders(current.access_token) }); } catch { /* Clear the local session even if sign-out cannot reach Auth. */ }
+      try {
+        const supabase = await getAuthClient();
+        await supabase.auth.setSession({ access_token: current.access_token, refresh_token: current.refresh_token });
+        await supabase.auth.signOut();
+      } catch { /* Clear the local session even if sign-out cannot reach Auth. */ }
     }
     session.clear();
     location.href = '/admin/learn-chinese/';
@@ -132,9 +144,10 @@
     try {
       const email = $('#admin-email').value.trim();
       const password = $('#admin-password').value;
-      const result = await authRequest('token?grant_type=password', { email, password });
-      if (jwtClaims(result.access_token).aal === 'aal2') acceptSession(result);
-      else await beginMfa(result);
+      const supabase = await getAuthClient();
+      const result = requireAuthData(await supabase.auth.signInWithPassword({ email, password }));
+      if (jwtClaims(result.session.access_token).aal === 'aal2') acceptSession(result.session);
+      else await beginMfa(result.session);
     } catch (error) { showMessage(error.message || 'Unable to sign in.'); }
     finally { button.disabled = false; }
   });
@@ -145,25 +158,20 @@
     try {
       const code = $('#mfa-code').value.replace(/\s/g, '');
       let challenge = challengeId;
+      const supabase = await getAuthClient();
       if (pendingEnrollment) {
-        const response = await fetch(`${config.supabaseUrl}/auth/v1/factors/${encodeURIComponent(factorId)}/challenge`, { method: 'POST', headers: apiHeaders(loginAccessToken), body: JSON.stringify({}) });
-        const value = await response.json().catch(() => ({}));
-        if (!response.ok) throw new Error('Could not verify authenticator setup.');
+        const value = requireAuthData(await supabase.auth.mfa.challenge({ factorId }));
         challenge = value.id;
       }
-      const verified = await fetch(`${config.supabaseUrl}/auth/v1/factors/${encodeURIComponent(factorId)}/verify`, { method: 'POST', headers: apiHeaders(loginAccessToken), body: JSON.stringify({ challenge_id: challenge, code }) });
-      const result = await verified.json().catch(() => ({}));
-      if (!verified.ok) throw new Error('That code could not be verified. Check it and try again.');
+      const result = requireAuthData(await supabase.auth.mfa.verify({ factorId, challengeId: challenge, code }));
       pendingEnrollment = null;
       challengeId = null;
-      acceptSession(result);
-    } catch (error) { showMessage(error.message || 'Verification failed.'); }
+      acceptSession(result.session);
+    } catch (error) { showMessage(error.message || 'That code could not be verified. Check it and try again.'); }
     finally { button.disabled = false; }
   });
   $('#cancel-mfa')?.addEventListener('click', async () => {
-    if (loginAccessToken) {
-      try { await fetch(`${config.supabaseUrl}/auth/v1/logout`, { method: 'POST', headers: apiHeaders(loginAccessToken) }); } catch { /* Drop the in-memory session even if Auth cannot be reached. */ }
-    }
+    if (loginAccessToken) try { const supabase = await getAuthClient(); await supabase.auth.signOut(); } catch { /* Drop the in-memory session even if Auth cannot be reached. */ }
     session.clear(); loginAccessToken = null; pendingEnrollment = null; challengeId = null; factorId = null; mfaPanel.hidden = true; showMessage('Sign in again when you are ready.', false);
   });
   $('#logout')?.addEventListener('click', (event) => { event.preventDefault(); window.AdminDashboard.logout(); });
