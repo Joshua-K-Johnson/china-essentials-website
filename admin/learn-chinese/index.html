@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="theme-color" content="#073c3d">
+  <title>Learn Chinese Admin · Overview</title>
+  <link rel="stylesheet" href="/admin/learn-chinese/assets/css/admin.css">
+  <script defer src="/admin/learn-chinese/assets/js/config.js"></script>
+  <script defer src="/admin/learn-chinese/assets/js/admin.js"></script>
+  <script defer src="/admin/learn-chinese/assets/js/overview.js"></script>
+</head>
+<body>
+  <section class="auth-screen" id="auth-screen" hidden aria-labelledby="login-title">
+    <div class="auth-card">
+      <div class="brand-lockup"><span class="brand-mark" aria-hidden="true">亭</span><span><strong>China Essentials</strong><small>Learn Chinese Admin</small></span></div>
+      <h1 id="login-title">Administrator sign in</h1>
+      <p>Sign in with an approved administrator account. Two-step verification is required to open dashboard data.</p>
+      <form id="login-form" class="auth-form">
+        <label for="admin-email">Email address</label><input id="admin-email" type="email" autocomplete="username" required>
+        <label for="admin-password">Password</label><input id="admin-password" type="password" autocomplete="current-password" required>
+        <button class="button button-primary" type="submit">Continue securely</button>
+      </form>
+      <div id="mfa-panel" class="mfa-panel" hidden>
+        <h2 id="mfa-title">Verify your sign-in</h2><p id="mfa-instructions"></p>
+        <img id="mfa-qr" class="mfa-qr" alt="Authenticator setup QR code" hidden>
+        <p id="mfa-secret-wrap" class="secret-wrap" hidden><span>Setup key</span><code id="mfa-secret"></code></p>
+        <form id="mfa-form" class="auth-form"><label id="mfa-code-label" for="mfa-code">Authenticator code</label><input id="mfa-code" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9 ]{6,8}" required><button id="mfa-verify" class="button button-primary" type="submit">Verify and continue</button></form>
+        <button id="cancel-mfa" class="text-button" type="button">Cancel and sign out</button>
+      </div>
+      <p id="login-message" class="notice" hidden role="status"></p>
+      <p class="auth-footnote">Access is limited to administrator UUIDs approved in Supabase.</p>
+    </div>
+  </section>
+
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <a class="brand-lockup sidebar-brand" href="/admin/learn-chinese/" aria-label="China Essentials Learn Chinese Admin home"><span class="brand-mark" aria-hidden="true">亭</span><span><strong>China Essentials</strong><small>Learn Chinese Admin</small></span></a>
+      <nav class="primary-nav" aria-label="Admin navigation">
+        <a class="nav-link is-active" href="/admin/learn-chinese/" aria-current="page"><span class="nav-icon" aria-hidden="true">⌂</span>Overview</a>
+        <a class="nav-link" href="/admin/learn-chinese/users/"><span class="nav-icon" aria-hidden="true">♙</span>Users</a>
+      </nav>
+      <div class="sidebar-art" aria-hidden="true"></div>
+      <button class="sidebar-close" type="button" data-close-sidebar aria-label="Close navigation">×</button>
+    </aside>
+    <main class="main-content">
+      <header class="topbar">
+        <button id="menu-toggle" class="menu-toggle" type="button" aria-label="Open navigation">☰</button>
+        <form class="global-search" id="global-search" role="search"><label class="sr-only" for="global-search-input">Search users</label><span aria-hidden="true">⌕</span><input id="global-search-input" type="search" placeholder="Search users by name or email…"><kbd>↵</kbd></form>
+        <div class="topbar-actions"><label class="sr-only" for="date-range">Dashboard date range</label><select id="date-range" class="select-control"><option value="30">Last 30 days</option><option value="7">Last 7 days</option><option value="90">Last 90 days</option></select><span class="admin-avatar" aria-hidden="true">CE</span><span class="admin-label">Administrator</span><button id="logout" class="text-button logout" type="button">Sign out</button></div>
+      </header>
+      <section class="page-heading has-landscape">
+        <div><p class="breadcrumb">Learn Chinese Admin</p><h1>Dashboard Overview</h1><p class="page-subtitle">A clear view of learner accounts and recorded study activity.</p></div>
+      </section>
+      <div id="page-error" class="notice notice-error page-notice" role="status" hidden></div>
+      <section class="stats-grid" aria-label="Account overview">
+        <article class="stat-card aqua"><span class="stat-icon" aria-hidden="true">♙</span><div><h2>Total registered users</h2><strong id="total-users" class="stat-number">—</strong><p>Non-guest Auth accounts</p></div></article>
+        <article class="stat-card mint"><span class="stat-icon" aria-hidden="true">◉</span><div><h2>Active learners</h2><strong id="active-learners" class="stat-number">—</strong><p>With recorded study in period</p></div></article>
+        <article class="stat-card gold"><span class="stat-icon" aria-hidden="true">♕</span><div><h2>Premium users</h2><strong id="premium-users" class="stat-number">—</strong><p>Valid store or reviewer access</p></div></article>
+        <article class="stat-card coral"><span class="stat-icon" aria-hidden="true">▣</span><div><h2>Deletion requests</h2><strong id="deletion-requests" class="stat-number small-value">Not tracked</strong><p>No request ledger is configured</p></div></article>
+        <article class="stat-card gold"><span class="stat-icon" aria-hidden="true">◷</span><div><h2>Expiring grants</h2><strong id="expiring-grants" class="stat-number">—</strong><p>Store access ending within 7 days</p></div></article>
+      </section>
+      <section class="overview-grid">
+        <article class="panel activity-panel">
+          <div class="panel-heading"><div><span class="panel-icon" aria-hidden="true">⌁</span><h2>Daily Active Learners</h2></div><span class="period-chip" id="period-label">Last 30 days</span></div>
+          <p class="panel-caption">Distinct registered accounts with recorded study each day.</p>
+          <div id="activity-chart" class="chart-wrap" role="img" aria-label="Daily active learners chart"><p class="loading">Loading learning activity…</p></div>
+        </article>
+        <article class="panel feature-panel">
+          <div class="panel-heading"><div><span class="panel-icon" aria-hidden="true">▥</span><h2>Feature Usage</h2></div></div>
+          <div class="unavailable-state"><span class="unavailable-mark" aria-hidden="true">◌</span><h3>Analytics not configured</h3><p>Feature-level events are not currently recorded by the app. No estimates are shown.</p></div>
+        </article>
+        <article class="panel recent-panel">
+          <div class="panel-heading"><div><span class="panel-icon" aria-hidden="true">☷</span><h2>Recent Activity</h2></div></div>
+          <div class="empty-state"><span aria-hidden="true">⌁</span><p>Administrative event history is not recorded yet.</p></div>
+        </article>
+        <article class="panel pending-panel">
+          <div class="panel-heading"><div><span class="panel-icon gold-text" aria-hidden="true">☑</span><h2>Pending Actions</h2></div></div>
+          <div class="empty-state"><span aria-hidden="true">✓</span><p>No request or approval queue is configured.</p></div>
+          <a class="subtle-link" href="/admin/learn-chinese/users/">Browse users <span aria-hidden="true">→</span></a>
+        </article>
+        <article class="panel hsk-panel">
+          <div class="panel-heading"><div><span class="panel-icon" aria-hidden="true">▤</span><h2>Currently Studying by HSK Level</h2></div><span class="panel-caption">Profile selections</span></div>
+          <div id="hsk-chart" class="hsk-chart"><p class="loading">Loading level counts…</p></div>
+        </article>
+        <article class="quote-card"><div><span class="quote-eyebrow">LEARN CHINESE</span><p>Build Chinese skills,<br>step by step.</p><span class="quote-rule"></span></div></article>
+      </section>
+      <footer class="page-footer">Private administrator workspace <span>·</span> Read-only in Phase 1</footer>
+    </main>
+  </div>
+
+</body>
+</html>

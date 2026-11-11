@@ -22,5 +22,10 @@
   X-Robots-Tag: noindex
   Referrer-Policy: no-referrer
 
+/admin/learn-chinese/*
+  ! Content-Security-Policy
+  Content-Security-Policy: default-src 'self'; connect-src 'self' https://rgpmyyilbeanaibzucsj.supabase.co; img-src 'self' data:; style-src 'self'; script-src 'self'; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests
+  X-Robots-Tag: noindex
+
 /assets/*
   Cache-Control: public, max-age=604800
