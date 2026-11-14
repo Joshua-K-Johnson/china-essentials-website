@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="540" viewBox="0 0 720 540" fill="none">
+  <title>Pronunciation practice illustration</title>
+  <desc>A Chinese flashcard with separate speaker and microphone controls and an example pronunciation score showing sound and tone details.</desc>
+  <rect x="20" y="18" width="680" height="504" rx="32" fill="#F8FCFC"/>
+  <circle cx="608" cy="92" r="45" fill="#FFF2D4"/>
+  <path d="M86 111h548" stroke="#DCE8E9" stroke-width="2"/>
+  <text x="88" y="83" fill="#0B8985" font-family="Arial,sans-serif" font-size="17" font-weight="700" letter-spacing="2">FLASHCARD PRACTICE</text>
+  <text x="114" y="233" fill="#092B43" font-family="Georgia,serif" font-size="94">请</text>
+  <text x="116" y="275" fill="#537083" font-family="Arial,sans-serif" font-size="22">qǐng · please</text>
+  <rect x="84" y="310" width="112" height="78" rx="22" fill="#E5F3F1"/>
+  <path d="M112 341h11l15-12v30l-15-12h-11z" stroke="#087F7A" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M146 336c5 5 5 15 0 20m8-28c9 9 9 27 0 36" stroke="#087F7A" stroke-width="3.5" stroke-linecap="round"/>
+  <text x="140" y="422" text-anchor="middle" fill="#315164" font-family="Arial,sans-serif" font-size="16" font-weight="700">Listen</text>
+  <rect x="214" y="310" width="112" height="78" rx="22" fill="#E5F3F1"/>
+  <rect x="258" y="329" width="24" height="34" rx="12" stroke="#087F7A" stroke-width="4"/>
+  <path d="M251 348v3a19 19 0 0 0 38 0v-3m-19 22v10m-12 0h24" stroke="#087F7A" stroke-width="4" stroke-linecap="round"/>
+  <text x="270" y="422" text-anchor="middle" fill="#315164" font-family="Arial,sans-serif" font-size="16" font-weight="700">Record</text>
+  <rect x="366" y="132" width="250" height="290" rx="26" fill="#FFFFFF" stroke="#DBE7E8" stroke-width="2"/>
+  <text x="396" y="180" fill="#507083" font-family="Arial,sans-serif" font-size="16" font-weight="700" letter-spacing="1">EXAMPLE RESULT</text>
+  <text x="396" y="248" fill="#092B43" font-family="Arial,sans-serif" font-size="48" font-weight="800">86%</text>
+  <text x="397" y="274" fill="#537083" font-family="Arial,sans-serif" font-size="15">Pronunciation score</text>
+  <path d="M396 300h190" stroke="#E1EAEB" stroke-width="2"/>
+  <circle cx="405" cy="336" r="7" fill="#0B8985"/>
+  <text x="424" y="342" fill="#315164" font-family="Arial,sans-serif" font-size="16">Sounds</text>
+  <rect x="511" y="328" width="74" height="15" rx="7.5" fill="#E4F1EF"/>
+  <rect x="511" y="328" width="58" height="15" rx="7.5" fill="#0B8985"/>
+  <circle cx="405" cy="377" r="7" fill="#D7A43A"/>
+  <text x="424" y="383" fill="#315164" font-family="Arial,sans-serif" font-size="16">Tones</text>
+  <rect x="511" y="369" width="74" height="15" rx="7.5" fill="#F5EBD5"/>
+  <rect x="511" y="369" width="51" height="15" rx="7.5" fill="#D7A43A"/>
+  <text x="88" y="477" fill="#738995" font-family="Arial,sans-serif" font-size="14">The speaker plays audio; the microphone records your voice.</text>
+</svg>

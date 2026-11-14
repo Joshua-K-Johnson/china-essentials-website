@@ -217,7 +217,7 @@ h3 { font-size: clamp(1.45rem, 2.3vw, 2rem); }
 .learn-section-heading > p:last-child { max-width: 680px; color: var(--learn-muted); margin: 22px 0 0; }
 .learn-page .meta { color: var(--learn-teal-deep); font-size: .74rem; letter-spacing: .13em; }
 .hsk-path { padding: clamp(82px,10vw,132px) 0; background: #fff; }
-.hsk-levels { display: grid; grid-template-columns: repeat(7,minmax(0,1fr)); gap: 12px; margin-top: 50px; }
+.hsk-levels { display: grid; grid-template-columns: repeat(6,minmax(0,1fr)); gap: 12px; margin-top: 50px; }
 .hsk-level { min-width: 0; overflow: hidden; background: #fff; border: 1px solid var(--learn-line); border-radius: 18px; box-shadow: 0 14px 34px rgba(6,29,49,.07); }
 .hsk-level img { width: 100%; height: 184px; object-fit: cover; }
 .hsk-level div { padding: 16px 13px 17px; }
@@ -244,8 +244,9 @@ h3 { font-size: clamp(1.45rem, 2.3vw, 2rem); }
 .feature-list article > span { display: grid; width: 50px; height: 50px; place-items: center; border-radius: 50%; background: #dff3f1; color: var(--learn-teal-deep); font-family: Georgia, "Times New Roman", serif; font-size: 1.25rem; }
 .feature-list h3 { margin-top: 22px; color: #061d31; font-size: 1.35rem; }
 .feature-list p { color: var(--learn-muted); font-size: .94rem; }
-.mock-story { grid-template-columns: 1fr .72fr; background: #f2ecdf; }
-.mock-phone { width: min(330px,74vw); margin-inline: auto; }
+.feature-illustration { display: block; width: min(100%, 680px); height: auto; margin-inline: auto; }
+.feature-availability { padding: 14px 16px; border-left: 3px solid var(--learn-teal); color: #385364 !important; background: rgba(255,255,255,.72); font-size: .9rem; }
+.pleco-story { background: #f2ecdf; }
 .offline-band { margin-top: 72px; padding: clamp(40px,6vw,72px); display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 50px; color: #d6e8f3; background: #061d31; border-radius: 34px; }
 .offline-band h3 { color: #fff; max-width: 760px; }
 .offline-band p { max-width: 700px; color: #b9cbd7; }
@@ -330,8 +331,6 @@ h3 { font-size: clamp(1.45rem, 2.3vw, 2rem); }
   .feature-story { grid-template-columns: 1fr; }
   .feature-story-copy { max-width: 650px; }
   .feature-phones { min-height: 540px; }
-  .mock-story .feature-story-copy { order: 0; }
-  .mock-story .mock-phone { order: 1; }
   .learn-support-band .wrap { grid-template-columns: 1fr; }
 }
 
